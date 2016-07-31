@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>sine chart</title>
+</head>
+
+<body>
+    <h1>sine chart</h1>
+    <canvas id="c" width=280" height="190"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../../g2-mec/g2.mec.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var g = g2().cartesian()
+                    .chart({x:35,y:35,b:200,h:120,
+                            funcs:[{data:[-2,6,0,-2,2,1,4,1,6,5],fill:true}],
+                            xaxis: {labels:false},
+                            yaxis: {labels:false}})
+                    .dim({x:35,y:170},{dx:200,dy:0}).label("b",0.5,"left")
+                    .dim({x:250,y:35},{dx:0,dy:120}).label("h")
+                    .use("nod",{x:35,y:35}).label("(x,y)","s")
+                    .exe(document.getElementById("c").getContext("2d"));
+   </script>
+</body>
+</html>

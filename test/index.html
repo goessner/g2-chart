@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>g2.chart tests</title>
+    <style>
+      td, th { border: 1px solid black; white-space:pre; font:11px monospace; overflow:hidden; text-overflow: ellipsis; }
+    </style>
+    <script src="../../g2/g2.js"></script>
+    <script src="../../g2-svg/g2.svg.js"></script>
+    <script src="../g2.chart.js"></script>
+<!--
+    <script src="https://gitcdn.xyz/repo/goessner/g2/master/g2.min.js"></script>
+    <script src="https://gitcdn.xyz/repo/goessner/g2-svg/master/g2.svg.min.js"></script>
+    <script src="https://gitcdn.xyz/repo/goessner/g2-mec/master/g2.mec.min.js"></script>
+-->
+    <script src="index.js"></script>
+    <script src="tests.js"></script>
+  </head>
+  <body>
+    <h1>g2.chart tests</h1>
+    <table id="test-table" style="table-layout:fixed; border:solid black 1px; border-collapse: collapse; max-width:100%;">
+      <thead>
+        <tr>
+          <th style="width:20px">test</th>
+          <th style="width:250px;max-width:250px">src</th>
+          <th style="width:201px">canvas</th>
+          <th style="width:201px">svg</th>
+        </tr>
+      </thead>
+      <tbody id="rows">
+      </tbody>
+    </table>
+
+  </body>
+  <template id="row-tmpl">
+    <tr id="row">
+      <td></td>
+      <td></td>
+      <td><canvas width="201" height="151"></canvas></td>
+      <td data-width="201" data-height="151"></td>
+    </tr>
+  </template>
+</html>

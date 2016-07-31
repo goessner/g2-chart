@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>data chart</title>
+</head>
+
+<body>
+    <h1>data chart</h1>
+    <canvas id="c" width="250" height="175"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../../g2-mec/g2.mec.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var g = g2().cartesian()
+                    .chart({x:35,y:35,b:200,h:120,
+                            funcs:[{data:[-2,6,0,-2,2,1,4,1,6,5],fill:true},
+                                   {fn: Math.sin,dx:Math.PI/30,fill:true}
+                           ],
+//                            xaxis:{title:"x-axis"},
+//                            yaxis:{title:"y-axis"}
+                           })
+                    .exe(document.getElementById("c").getContext("2d"));
+   </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>tangent chart</title>
+</head>
+
+<body>
+    <h1>tangent chart</h1>
+    <canvas id="c" width=400" height="300"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var g = g2().cartesian(),
+            ch = g2.Chart.create({x:100,y:100,b:200,h:150, ls:"black",
+                                  xmin:-Math.PI/3,xmax:1.3*Math.PI,
+                                  ymin:-5,ymax:5,
+                                  funcs:[{fn:Math.tan,dx:Math.PI/240,fill:true}],
+                                  title:{text:"tangent"},
+                                  xaxis:{title:{text:"phi"},grid:true},
+                                  yaxis:{title:{text:"sin(phi)"},origin:true}
+            }),
+            p = ch.pixOf({x:0,y:0});
+          g.cpy(ch.draw(g))
+//           .cir(p.x,p.y,3)
+           .exe(document.getElementById("c").getContext("2d"));
+//        var ax = g2.Chart.AutoAxis.create(2,4,0,100);
+   </script>
+</body>
+</html>

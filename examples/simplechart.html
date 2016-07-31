@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>simple chart</title>
+</head>
+
+<body>
+    <h1>simple chart</h1>
+    <canvas id="c" width="700" height="400"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var g = g2().cartesian(),
+            ch = g2.Chart.create({x:100,y:100,b:200,h:150,
+//                                  xmin:-2, xmax:500,
+//                                  ymin:-50,ymax:100,
+                                  funcs:[{data:[-1,4,2,-2,1,2,4,1],spline:true,dots:true}],
+                                  title:{text:"chart"},
+//                                  yaxis: false,
+//                                  xaxis:{title:"X-axis",grid:true,origin:true,style:{ls:"red",foc:"red"}},
+//                                  yaxis:{title:"y-axis",grid:true,origin:true,style:{ls:"orange",foc:"orange"}},
+            });
+//            p = ch.pixOf({x:0,y:0});
+          g.cpy(ch.draw(g))
+//           .cir(p.x,p.y,3)
+           .exe(document.getElementById("c").getContext("2d"));
+//        var ax = g2.Chart.AutoAxis.create(2,4,0,100);
+   </script>
+</body>
+</html>

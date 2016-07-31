@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>sine chart</title>
+</head>
+
+<body>
+    <h1>sine chart</h1>
+    <canvas id="c" width=240" height="150"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var pi = Math.PI;
+        g2().cartesian()
+            .chart({x:25,y:25,b:200,h:100,
+                    title:{text:"sine + tan"},
+                    xmin:-Math.PI/2,xmax:2*Math.PI,
+                    ymin:-3,ymax:3,
+                    funcs:[
+                     {fn:Math.sin,dx:Math.PI/30,fill:true},
+                     {fn:Math.tan,dx:Math.PI/90,fill:true}
+                    ]})
+            .exe(document.getElementById("c").getContext("2d"));
+   </script>
+</body>
+</html>

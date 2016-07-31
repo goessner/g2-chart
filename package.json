@@ -1,0 +1,34 @@
+{
+  "name": "g2d-chart",
+  "version": "0.2.0",
+  "description": "g2-chart - Chart addon for g2",
+  "keywords": [
+    "chart",
+    "line chart",
+    "vector",
+    "graphics",
+    "2d",
+    "g2",
+    "canvas",
+    "svg",
+    "javascript"
+  ],
+  "main": "g2.chart.js",
+  "scripts": {
+    "build": "npm run minify && npm run cptest",
+    "minify": "uglifyjs ./g2.chart.js -o ./g2.chart.min.js --comments -m",
+    "cptest": "copyfiles -f ./test/*.* ../goessner.github.io/g2-chart/test"
+  },
+  "author": "Stefan Goessner <fang03@web.de>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goessner/g2-chart.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "concat": "^1.0.0",
+    "jsdoc-to-markdown": "^1.3.2",
+    "jslint": "^0.9.5",
+    "uglifyjs": "^2.4.10"
+  }
+}
