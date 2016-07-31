@@ -14,16 +14,16 @@ Line charts are the most important charts from an engineer's point of view.
 <script src="./g2.chart.js"></script>
 <script>
   g2().cartesian()
-      .chart({x:35,y:35,b:200,h:120,
-              funcs:[{data:[-2,6,0,-2,2,1,4,1,6,5],fill:true}],
+      .chart({x:35, y:35, b:200, h:120,
+              funcs:[{data:[-2,6,0,-2,2,1,4,1,6,5], fill:true, dots:true}],
              })
       .exe(document.getElementById("c").getContext("2d"));
 </script>
 ```
 ## Chart usage
 `g2.chart` introduces a new `chart` command, which expects a single javascript object
-specifying the chart properties. In order to use it you need to set `g2`'s 
-cartesian flag. You will dimension the chart by specifying the lower left corner `x` and `y` 
+specifying the chart properties. In order to use it properly you need to set `g2`'s 
+cartesian flag. You want to set the chart dimensions by specifying the lower left corner `x` and `y` 
 as well as width `b` and height `h` of the rectangular chart area. 
 Please note, that chart title, axis ticks, labels and titles are not included in that dimensions.
 
@@ -31,7 +31,7 @@ Please note, that chart title, axis ticks, labels and titles are not included in
 
 ## Chart functions, range and style
 Line charts display functional relations. These relations can be represented numerically via datasets or 
-algebraic via functions. Both representations can be used by `g2.chart`. A single chart can contain multiple 
+algebraically via functions. Both representations can be used by `g2.chart`. A single chart can contain multiple 
 functions and even mix numerical and algebraic forms.
 
 The chart x-value range is extracted from available datasets or must be explicitly specified. Its 
@@ -102,7 +102,13 @@ You can overwrite the the default values, if you are not comfortable with them.
 | `title.text` | `string` | `null` | chart title string. |
 | `title.offset` | `float` | `3` | vertical offset to chart area. |
 | `title.style` | `object` | `{foc:"black", foz:16, thal:"center", tval:"bottom"}` | title style. |
-| `funcs` | `array` | `[]` | array of datasets and / or functions. |
+| `funcs` | `array` | `[]` | array of dataset `data` and / or function `fn` objects. |
+| `funcs[item]` | `object` | | dataset and / or function object. |
+| `funcs[item].data` | `array` | | array of data points as flat array `[x,y,..]`, array of point arrys `[[x,y],..]` or array of point objects  `[{x,y},..]`. |
+| `funcs[item].fn` | `function` | | Function `y = f(x)` accepting x-value returning y-value. |
+| `funcs[item].dx` | `float` |  | x increment to apply to function `fn`. Ignored with data points. |
+| `funcs[item].fill` | `boolean` | `false` | Fill region between function polygon and x-origin line. |
+| `funcs[item].dots` | `boolean` | `false` | Place circular dots at data points. Better avoid withs `fn`s. |
 | `xaxis` | `object` | | x-axis properties. |
 | `xaxis.style` | `object` | `{ls:"#888", thal:"center", tval:"top", foc:"black"}` | x-axis style. |
 | `xaxis.title` | `string` or `object` | | x-axis title string or object specifying title properties. |

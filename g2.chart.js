@@ -152,9 +152,9 @@ g2.Chart = {
             else
                g.ply(plydata,false,style);
             if (fn.dots) {
-               g.beg({fs:style.ls,ls:"transparent"});
+               g.beg({fs:"snow"});
                for (var i=0; i<plydata.length; i++)
-                  g.rec(plydata[i].x-2,plydata[i].y-2,4,4);
+                  g.cir(plydata[i].x,plydata[i].y,3);
                g.end();
             }
          }
