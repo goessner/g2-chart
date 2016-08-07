@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>g2 - markers on chart</title>
+</head>
+
+<body>
+    <h1>g2 - markers on chart</h1>
+    <canvas id="c" width="300" height="200"></canvas><br>
+    <script src="https://gitcdn.xyz/repo/goessner/g2/master/g2.min.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+      var ctx = document.getElementById("c").getContext("2d"),
+          g = g2(),
+          ch = g2.Chart.create({ x:50,y:50,b:200,h:100,
+                                 funcs:[{data:[-1,-2,3,2,6,0],fill:true}],
+                                 title:{text:"marker on chart"},
+                                 yaxis:{origin:true}
+                              });
+      g.cartesian()
+       .chart(ch)
+       .cpy(ch.drawMarkersAt(g,4))
+       .exe(ctx);
+   </script>
+</body>
+</html>

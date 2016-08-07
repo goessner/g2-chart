@@ -2,8 +2,8 @@
 
 # g2.chart
 
-`g2.chart` is a [`g2`](https://github.com/goessner/g2) addon for generating simple x/y-line charts. 
-Line charts are the most important charts from an engineer's point of view.
+`g2.chart` is an important brick for `g2.js` being an engineers and scientists graphics tool.
+`g2.chart` as a [`g2`](https://github.com/goessner/g2) addon generates x/y-line charts only, but it does it very well. 
 
 ### Example: first chart
 ![g2 %amp; charts](./img/data.png)
@@ -14,8 +14,12 @@ Line charts are the most important charts from an engineer's point of view.
 <script src="./g2.chart.js"></script>
 <script>
   g2().cartesian()
-      .chart({x:35, y:35, b:200, h:120,
-              funcs:[{data:[-2,6,0,-2,2,1,4,1,6,5], fill:true, dots:true}],
+      .chart({ x:35, y:35, b:200, h:120,
+               funcs:[
+                 { data:[-2,6,0,-2,2,1,4,1,6,5], 
+                   fill:true, 
+                   dots:true }
+               ],
              })
       .exe(document.getElementById("c").getContext("2d"));
 </script>
@@ -30,8 +34,8 @@ Please note, that chart title, axis ticks, labels and titles are not included in
 ![dimensions](./img/dimensions.png)
 
 ## Chart functions, range and style
-Line charts display functional relations. These relations can be represented numerically via datasets or 
-algebraically via functions. Both representations can be used by `g2.chart`. A single chart can contain multiple 
+Line charts display functional relations. These relations can be numerically represented via datasets or 
+algebraically via functions. `g2.chart` offers both representations. A single chart can contain multiple 
 functions and even mix numerical and algebraic forms.
 
 The chart x-value range is extracted from available datasets or must be explicitly specified. Its 
@@ -56,11 +60,11 @@ g2().cartesian()
 
 In this example the x-value range is explicitely set by `xmin` and `xmax`. It is valid then for all functions.
 The y-value range is also explicitely set by `ymin` and `ymax`. That is done here only, because 
-the `tan`-function has singularities at odd multiples of `pi/2`. So its chartis  simply clipped to the 
+the `tan`-function has singularities at odd multiples of `pi/2`. So its chart is  simply clipped to the 
 desired range of `[-3,3]`.
 
 Please note that we didn't specify a color for displaying the functions in the last example. `g2.chart` provides a small set of 
-default colors for sequentially assigning them to functions without explicite color definitions. If the function 
+default colors for sequentially assigning them to functions without explicite color definitions. If the 
 `fill` property is set to `true`, the function chart is filled with respect to the `zero` x-axis using 
 its semi-transparent function color.
 
@@ -69,19 +73,64 @@ its semi-transparent function color.
 
 ```js
 g2().cartesian()
-    .chart({ x:35, y:35, b:200, h:100,
-             title: { text:"sin(φ)" },
-             xmin:-Math.PI/2, xmax:2*Math.PI,
-             funcs:[ { fn:Math.sin, dx:Math.PI/30, fill:true } ],
-             xaxis: {
-               title: "φ",
-               grid: true,
-               origin: true
-             },
-             yaxis: { title:"sin(φ)" }
-           })
+    .chart({ x:35,y:35,b:200,h:100,
+             title:{ text:"sin(φ)"},
+                     xmin:-Math.PI/2,xmax:2*Math.PI,
+                     funcs:[
+                       {fn:Math.sin,dx:Math.PI/30,fill:true}
+                     ],
+                     xaxis: {
+                       title:"φ",
+                       grid:true
+                     },
+                     yaxis: {
+                       title:"sin(φ)",
+                       origin:true
+                     }
+                   })
     .exe(ctx);
 ```
+
+## Chart API
+
+After a chart object is created, we might wan to interact with it then. So we would like to request 
+canvas coordinates for certain chart area coordinates. There is a small API for supporting tasks like this.
+
+| Method | Arguments | Returns | Description |
+| --- | --- | --- | --- |
+| `valOf(pix)` | `pix` canvas point | `object` | Point value in chart coordinates from point in canvas coordinates. |
+| `pixOf(usr)` | `usr` chart point | `object` | Point value in canvas coordinates from point in chart coordinates. |
+| `trimPixOf(usr)` | `usr` chart point | `object` | Point value in canvas coordinates from point in chart coordinates trimmed to chart area region limits. |
+| `yOf(x)` | `x` chart x-value | `float` | y-value in chart coordinates. |
+| `drawMarkersAt(g,x)` | `g` `g2` instance `x` chart x-value | `object` | Draw marker points in canvas coordinates to `g2` instance `g` according to x-value for all functions in chart. |
+
+It is possible to place markers on the chart functions after it is gerenerated. For this we need to create a standalone chart instance via `g2.Chart.create` first.
+### Example: chart marker
+![chart marker](./img/marker.png)
+
+```js
+var ctx = document.getElementById("c").getContext("2d"),
+    g = g2(),
+    ch = g2.Chart.create({ x:100,y:100,b:200,h:100,
+                           funcs:[{data:[-1,-2,3,2,6,0],fill:true}],
+                           title:{text:"marker on chart"},
+                           yaxis:{origin:true}
+                         });
+ g.cartesian()
+  .chart(ch)
+  .cpy(ch.drawMarkersAt(g,4))
+  .exe(ctx);
+```
+Those markers can be modified interactively
+
+### Example: interactive chart
+![dynamic charts](./img/interactive.gif)
+
+or animated with respect of simulation parameters.
+
+### Example: first chart
+![dynamic charts](./img/dynamic.gif)
+
 
 ## Chart Properties
 
@@ -104,11 +153,11 @@ You can overwrite the the default values, if you are not comfortable with them.
 | `title.style` | `object` | `{foc:"black", foz:16, thal:"center", tval:"bottom"}` | title style. |
 | `funcs` | `array` | `[]` | array of dataset `data` and / or function `fn` objects. |
 | `funcs[item]` | `object` | | dataset and / or function object. |
-| `funcs[item].data` | `array` | | array of data points as flat array `[x,y,..]`, array of point arrys `[[x,y],..]` or array of point objects  `[{x,y},..]`. |
+| `funcs[item].data` | `array` | | array of data points as flat array `[x,y,..]`, array of point arrays `[[x,y],..]` or array of point objects  `[{x,y},..]`. |
 | `funcs[item].fn` | `function` | | Function `y = f(x)` accepting x-value returning y-value. |
 | `funcs[item].dx` | `float` |  | x increment to apply to function `fn`. Ignored with data points. |
 | `funcs[item].fill` | `boolean` | `false` | Fill region between function polygon and x-origin line. |
-| `funcs[item].dots` | `boolean` | `false` | Place circular dots at data points. Better avoid withs `fn`s. |
+| `funcs[item].dots` | `boolean` | `false` | Place circular dots at data points. Better avoid with `fn`s. |
 | `xaxis` | `object` | | x-axis properties. |
 | `xaxis.style` | `object` | `{ls:"#888", thal:"center", tval:"top", foc:"black"}` | x-axis style. |
 | `xaxis.title` | `string` or `object` | | x-axis title string or object specifying title properties. |
@@ -140,7 +189,9 @@ You can overwrite the the default values, if you are not comfortable with them.
 | `yaxis.labels.offset` | `float` | `1` | horizontal y-axis labels string offset. |
 | `yaxis.labels.style` | `object` | `{foz:11}` | y-axis labels style. Not specified properties are inherited from `yaxis.style`. |
 
-### Tests
+
+
+## Tests
 
 See this growing table of [test cases](https://goessner.github.io/g2-chart/test/index.html) with canvas and svg output side by side.
 

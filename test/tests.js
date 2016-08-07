@@ -30,19 +30,19 @@ var tests = [
          }
         })`
 },
-{ title: "x-axis\ndefault\nwith\nx-range",
-  src: `g2().cartesian()
- .chart({x:70,y:35,b:120,h:90,
-         title:"stormy monday",
-         xmin:0, xmax:100,
-        })`
-},
-{ title: "no\nx-axis",
+{ title: "x-range\nbut no\nx-axis",
   src: `g2().cartesian()
  .chart({x:70,y:35,b:120,h:90,
          title:"very long title",
          xmin:-20, xmax:100,
          xaxis:false,
+        })`
+},
+{ title: "x-axis\ndefault\nwith\nx-range",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         title:"stormy monday",
+         xmin:0, xmax:100,
         })`
 },
 { title: "x-axis\ntitle\nno\nrange",
@@ -52,6 +52,108 @@ var tests = [
          xaxis:{
            title:"X-axis"
          },
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:0, xmax:1,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:0, xmax:12,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:0,xmax:100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:20,xmax:100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-20,xmax:100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:25,xmax:100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-25,xmax:100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-225,xmax:-100,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:0,xmax:115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:20,xmax:115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-20,xmax:115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:25,xmax:115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-25,xmax:115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-225,xmax:-115,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-275,xmax:137,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-325,xmax:137,
+        })`
+},
+{ title: "x-axis\n\nrange",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+         xmin:-0.75,xmax:0.75,
         })`
 },
 { title: "x-axis\ntitle\nwith\nrange",
@@ -383,6 +485,20 @@ var tests = [
              dx:pi/30,
              fill:true}
      ],
+  })`
+},
+{ title: "fn\ntrimmed\ny-region",
+  src: `g2().cartesian()
+ .chart({x:70,y:35,b:120,h:90,
+   title:{text:"tangent"},
+   xmin:-pi/3,xmax:4/3*pi,
+   ymin:-5,ymax:5,
+   funcs:[{fn:Math.tan,dx:pi/240,
+       fill:true}],
+   xaxis:{title:{text:"phi"},
+       grid:true},
+   yaxis:{title:{text:"sin(phi)"},
+       origin:true}
   })`
 },
 ];

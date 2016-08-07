@@ -8,18 +8,13 @@
 if (this.require !== undefined)  // assume 'g2.js' in the same directory ...
    g2 = require("./g2.js");
 
-/**
- * Line chart extensions.
- * (Requires cartesian coordinates)
- * @namespace
- */
 var g2 = g2 || { prototype:{} };  // for jsdoc only ...
 
 /**
  * Create a line chart.<br>
  * @constructor
  * @returns {object} chart
- * @param {object} args Chart arguments object.
+ * @param {object} args Chart arguments object or 
  * @param {float} args.x x-position of chart rectangle.
  * @param {float} args.y y-position of chart rectangle.
  * @param {float} [args.b=150} breadth of chart rectangle.
@@ -36,6 +31,13 @@ g2.prototype.chart = function chart(args) {
    return ch.draw(this);
 }
 
+/** 
+ * `g2.Chart` is a tiny class for creating line charts. As a `g2`extension it is meant to be used with `g2` models.
+ * But it can also be used standalone. (Requires cartesian coordinates).   
+ * Do not use `new g2.Chart()`, call `g2.Chart.create()` instead for creating instances.
+ * @class 
+ * @namespace
+ */
 g2.Chart = {
    create: function() { var o = Object.create(this.prototype); o.constructor.apply(o,arguments); return o; },
    prototype: {
@@ -54,14 +56,16 @@ g2.Chart = {
          if (this.ymin !== undefined && this.ymax !== undefined)
             this.yAxis = g2.Chart.AutoAxis.create(this.ymin,this.ymax,0,this.h);
       },
-      // get chart property ... custom or default value.
+     /**
+      * Get chart property as custom or default value.
+      * @private
+      */
       get: function(n1,n2,n3,n4) {
           var loc = n4 ? this[n1] && this[n1][n2] && this[n1][n2][n3] && this[n1][n2][n3][n4]
                        : n3 ? this[n1] && this[n1][n2] && this[n1][n2][n3]
                             : n2 ? this[n1] && this[n1][n2]
                                  : n1 ? this[n1] 
                                       : undefined;
-//          console.log(loc)
           return loc !== undefined 
                ? loc
                : n4 ? g2.Chart[n1] && g2.Chart[n1][n2] && g2.Chart[n1][n2][n3] && g2.Chart[n1][n2][n3][n4]
@@ -70,6 +74,10 @@ g2.Chart = {
                                : n1 ? g2.Chart[n1]
                                     : undefined;
       },
+      /**
+       * Initialize char function.
+       * @private
+       */
       initFunc: function(fn,setXmin,setXmax,setYmin,setYmax) {
          // Install func iterator.
          var itr;
@@ -77,11 +85,7 @@ g2.Chart = {
             itr = fn.itr = g2.prototype.ply.itrOf.call(null,fn.data);  // get iterator ...
          }
          else if (fn.fn && !setXmin && !setXmax && fn.dx) {
-            var self = this;
-            itr = fn.itr = function(i) {
-               var x = self.xmin + i*fn.dx;
-               return { x:x,y:fn.fn(x) };
-            }
+            itr = fn.itr = (i) => { var x = this.xmin + i*fn.dx; return { x:x,y:fn.fn(x) }; }
             itr.len = (this.xmax - this.xmin)/fn.dx + 1;
          }
          // Get func's bounding box
@@ -101,26 +105,68 @@ g2.Chart = {
             if (setXmax && (this.xmax === undefined || xmax < this.xmax)) this.xmax = xmax;
             if (setYmin && (this.ymin === undefined || ymin < this.ymin)) this.ymin = ymin;
             if (setYmax && (this.ymax === undefined || ymax < this.ymax)) this.ymax = ymax;
+
+            if (fn.color && typeof fn.color === "number") fn.color = g2.Chart.func.colors[fn.color % g2.Chart.func.colors.length];
          }
       },
+      /**
+       * Point value in user coordinates of chart area from canvas point.
+       * @returns {object} Chart area point.
+       * @param {object} pix Point in canvas coordinates.
+       */
       valOf: function(pix) {  // to do implementation ...
          return pix;
       },
-      pixOf: function(val) {
-         return { x: this.x + (val.x - this.xAxis.zmin)*this.xAxis.scl,
-                  y: this.y + (val.y - this.yAxis.zmin)*this.yAxis.scl };
+      /**
+       * Point value in canvas coordinates of point in user coordinates from chart area.
+       * @returns {object} Canvas point.
+       * @param {object} usr Point in canvas coordinates.
+       */
+      pixOf: function(usr) {
+         return { x: this.x + (usr.x - this.xAxis.zmin)*this.xAxis.scl,
+                  y: this.y + (usr.y - this.yAxis.zmin)*this.yAxis.scl };
       },
+      /**
+       * Point value in canvas coordinates of point in user coordinates from chart area.
+       * Yields same result as `pixOf` but trimmed to chart area region limits.
+       * @returns {object} Canvas point.
+       * @param {object} usr Trimmed point in canvas coordinates.
+       */
       trimPixOf: function(val) {
          return { x: this.x + Math.max(Math.min((val.x - this.xAxis.zmin)*this.xAxis.scl,this.b),0),
                   y: this.y + Math.max(Math.min((val.y - this.yAxis.zmin)*this.yAxis.scl,this.h),0) };
       },
+      /**
+       * Y-value in user coordinates from x-value in user coordinates for a specific function.
+       * @returns {float} Y-value in user coordinates.
+       * @param {float} x X-axis in user coordinates.
+       */
+      yOf: function(fnc,x) {
+         if (fnc.fn)
+            return fnc.fn(x);
+         else if (fnc.data) {
+            var cur, prv = fnc.itr(0), yprv;
+            for (var i=1; i<fnc.itr.len; i++) {
+               cur = fnc.itr(i);
+               if (prv.x < x && x <= cur.x)
+                  return prv.y + (x - prv.x)/(cur.x - prv.x)*(cur.y - prv.y);
+               prv = cur;
+            }
+         }
+         return fnc.itr(0);
+      },
+      /**
+       * Append chart to *g2* object `g`.
+       * @returns {object} *g2* object `g`.
+       * @param {object} g *g2* object to append chart to.
+       */
       draw: function(g) {
          var title = this.title,
              funcs = this.get("funcs");
          // draw background & border ...
          g.rec(this.x,this.y,this.b,this.h,this.get("style"));
          // draw title & axes ...
-         g.beg(Object.assign({x:this.x,y:this.y},g2.Chart.style,this.style));
+         g.beg(Object.assign({x:this.x,y:this.y,lw:1},g2.Chart.style,this.style));
          if (title)
             g.txt(title.text || title,this.b/2,this.h + this.get("title","offset"),0,
                   Object.assign({},g2.Chart.title.style,this.title && this.title.style));
@@ -128,17 +174,21 @@ g2.Chart = {
          this.drawYAxis(g);
          g.end();
          // draw funcs ...
-         if (funcs && funcs.length)
-            for (var i=0; i<funcs.length; i++)
-               this.drawFunc(g,funcs[i],g2.Chart.func.color[i]);
+         if (funcs)
+            funcs.forEach((fnc,i) => { this.drawFunc(g,fnc,g2.Chart.func.colors[i]); });
          return g;
       },
+      /**
+       * Draw chart function.
+       * @private
+       */
       drawFunc: function(g,fn,defaultcolor) {
          var plydata = [], itr = fn.itr,
              fill = fn.fill || fn.style && fn.style.fs && fn.style.fs !== "transparent",
+             color = fn.color = fn.color || fn.style && fn.style.ls || defaultcolor,
              style = Object.assign({},g2.Chart.func.style,
-                                      fill ? {ls:defaultcolor,fs:(defaultcolor[0]==="#" ? g2.Chart.semiTransparentOf(defaultcolor) : defaultcolor)}
-                                           : {ls:defaultcolor},
+                                      fill ? {ls:color,fs:g2.Chart.Color.rgbaStr(color,0.125)}
+                                           : {ls:color},
                                       fn.style);
          if (itr) {
             if (fill)  // start from base line (y=0)
@@ -154,11 +204,27 @@ g2.Chart = {
             if (fn.dots) {
                g.beg({fs:"snow"});
                for (var i=0; i<plydata.length; i++)
-                  g.cir(plydata[i].x,plydata[i].y,3);
+                  g.cir(plydata[i].x,plydata[i].y,2,{lw:1});
                g.end();
             }
          }
       },
+      /**
+       * Draw marker points in canvas coordinates according to x-axis value in user space for all functions in chart.
+       * @returns {object} `g2` object.
+       * @param {object} g `g2`target object.
+       * @param {float} x X-axis value.
+       */
+      drawMarkersAt: function(g,x) {
+         var mrk;
+         this.funcs.forEach(fnc => { if (x > fnc.xmin + Number.EPSILON && x < fnc.xmax - Number.EPSILON)
+                                        g.cir((mrk=this.trimPixOf({x:x,y:this.yOf(fnc,x)})).x,mrk.y,3,{ls:fnc.color,fs:"whitesmoke",lw:1})}); 
+         return g;
+      },
+      /**
+       * Draw x-axis.
+       * @private
+       */
       drawXAxis: function(g) {
          var tick,
              showgrid = this.xaxis && this.xaxis.grid,
@@ -181,12 +247,12 @@ g2.Chart = {
             tick = itr(i);
             if (showticks) g.lin(tick.t,0,tick.t,tick.maj ? -ticklen : -2/3*ticklen);
             if (showgrid)  g.lin(tick.t,0,tick.t,this.h,gridstyle);
-            if (showorigin && tick.z === 0) g.lin(tick.t,0,tick.t,this.h);  // origin line emphasized ...
             if (showlabels && tick.maj)  // add label
-               g.txt(tick.z,tick.t,-(this.get("xaxis","ticks","len")+this.get("xaxis","labels","offset")),0,
+               g.txt(parseFloat(tick.z),tick.t,-(this.get("xaxis","ticks","len")+this.get("xaxis","labels","offset")),0,
                      Object.assign({},g2.Chart.xaxis.labels.style,this.xaxis && this.xaxis.labels && this.xaxis.labels.style));
          }
          if (showline) g.lin(0,0,this.b,0);
+         if (showorigin && this.xmin <= 0 && this.xmax >= 0) g.lin(-this.xAxis.zmin*this.xAxis.scl,0,-this.xAxis.zmin*this.xAxis.scl,this.h);  // origin line emphasized ...
          if (title) {
             g.txt(title.text || title,this.b/2,-(  this.get("xaxis","title","offset")
                                                  +(showticks  && this.get("xaxis","ticks","len") || 0)     
@@ -196,6 +262,10 @@ g2.Chart = {
          }
          g.end();
       },
+      /**
+       * Draw y-axis.
+       * @private
+       */
       drawYAxis: function(g) {
          var tick,
              showgrid = this.yaxis && this.yaxis.grid,
@@ -218,11 +288,11 @@ g2.Chart = {
             tick = itr(i);
             if (showticks) g.lin(0,tick.t,tick.maj ? -ticklen : -2/3*ticklen,tick.t);
             if (showgrid)  g.lin(0,tick.t,this.b,tick.t,gridstyle);
-            if (showorigin && tick.z === 0) g.lin(0,tick.t,this.b,tick.t);  // origin line emphasized ...
             if (showlabels && tick.maj)  // add label
-               g.txt(tick.z,-(this.get("yaxis","ticks","len")+this.get("yaxis","labels","offset")),tick.t,Math.PI/2);
+               g.txt(parseFloat(tick.z),-(this.get("yaxis","ticks","len")+this.get("yaxis","labels","offset")),tick.t,Math.PI/2);
          }
          if (showline) g.lin(0,0,0,this.h);
+         if (showorigin && this.ymin <= 0 && this.ymax >= 0) g.lin(0,-this.yAxis.zmin*this.yAxis.scl,this.b,-this.yAxis.zmin*this.yAxis.scl);  // origin line emphasized ...
          if (title)
             g.txt(title.text || title,-( this.get("yaxis","title","offset")
                                         +(showticks  && this.get("yaxis","ticks","len") || 0)   
@@ -234,6 +304,7 @@ g2.Chart = {
    },
 /**
  * Create an axis from given range with ticks.<br>
+ * @private
  * @constructor
  * @returns {object} axis
  * @param {float} zmin min-value in user units.
@@ -246,13 +317,17 @@ g2.Chart = {
       prototype: {
          constructor: function(zmin,zmax,tmin,tmax) {
             var base = 2, exp = 1, eps = Math.sqrt(Number.EPSILON),
-                dtick,                     // tickrange
-                t0,                        // first tick
-                dz = zmax - zmin || 1,     // value range
-                dt = tmax - tmin || 1,     // pixel range
-                scl = dz > eps ? dt/dz : 1;
-            while ((dtick = scl*base*Math.pow(10,exp)) < 14 || dtick > 35) {  // 14 < dtick <= 35 !
-               if (dtick < 14) {
+                Dz = zmax - zmin || 1,      // value range
+                Dt = tmax - tmin || 1,      // area range
+                s = Dz > eps ? Dt/Dz : 1,   // scale [usr]->[pix]
+                dz = base*Math.pow(10,exp), // tick size [usr]
+                dt = s*dz,                  // tick size [pix]
+                N,                          // # segments
+                dt01,                       // reminder segment
+                i0, j0, jth, t0;
+
+            while (dt < 14 || dt > 35) {
+               if (dt < 14) {
                   if      (base == 1) base = 2;
                   else if (base == 2) base = 5;
                   else if (base == 5) { base = 1; exp++; }
@@ -262,54 +337,60 @@ g2.Chart = {
                   else if (base == 2) base = 1;
                   else if (base == 5) base = 2;
                }
+               dz = base*Math.pow(10,exp);
+               dt = s*dz;
             }
-            t0 = Math.abs(zmin*scl%dtick);
-            t0 = t0 < eps || dtick - t0 < eps ? 0 : t0;
-//            console.log(t0+";"+dtick+";"+(dtick-t0)+";"+eps)
-            this.scl = scl;                                // scale [usr]->[pix]
-            this.zmin = zmin;                              // min. value [usr]
-            this.dz = dz;                                  // value range [usr]
-            this.tmin = tmin;                              // min. value [pix]
-            this.dt = dt;                                  // pixel range [pix]
+            i0 = (s*Math.abs(zmin) + eps/2)%dt < eps
+               ? Math.floor(zmin/dz)
+               : Math.floor(zmin/dz) + 1;
+            z0 = i0*dz;
+            t0 = Math.round(s*(z0 - zmin));
+            N = Math.floor((Dt - t0)/ dt) + 1;
+            j0 = base % 2 && i0 % 2 ? i0 + 1 : i0; 
+            jth = exp === 0 && N < 11 ? 1 : base===2 && N > 9 ? 5 : 2;
+
+            this.zmin = zmin;
+            this.zmax = zmax;
+            this.base = base;                              // [1,2,5]
             this.exp = exp;                                // 10^exp
-            this.dtick = dtick;                            // tickrange [pix] ... scl*base*10^exp
-            this.jth = base===2 ? 5 : 2;                   // tick count between every major tick
-            this.i0 = zmin >= 0 || t0 === 0                // start tick index relative to zero
-                    ? Math.floor(zmin*scl/dtick)           // Math.floor has strange behaviour ..
-                    : Math.floor(zmin*scl/dtick + 1);      // .. for negative numbers !
-            this.z0 = this.i0*dtick/scl;                   // start tick value [usr] .. not used !
-            this.t0 = Math.floor(t0);// start tick [pix]
-//            z       = i*dtick/scl + j0*dtick/scl
-//            this.t0 = Math.floor((this.z0 - zmin)*scl + tmin + 0.5); // start tick value [pix]
-//console.log("dtick="+this.dtick)
-//console.log("zmin*scl%dtick="+(zmin*scl%dtick))
-//console.log("i0="+this.i0)
-//console.log("t0="+this.t0)
-//console.log("z0="+this.z0)
+            this.scl = s;                                  // scale [usr]->[pix]
+            this.dt = dt;                                  // tick range [pix]
+            this.dz = dz;                                  // tick range [usr]
+            this.N = N;                                    // # of ticks
+            this.t0 = t0;                                  // start tick position [pix]
+            this.z0 = z0;                                  // start tick position [usr]
+            this.i0 = i0;                                  // first tick index relative to tick origin (can be negative)
+            this.j0 = j0;                                  // first labeled tick
+            this.jth = jth;                                // # of ticks between two major ticks
+/*
+            console.log("zmin="+zmin+", zmax="+zmax+", Dz="+Dz)
+            console.log("tmin="+tmin+", tmax="+tmax+", Dt="+Dt)
+            console.log("s="+s+", base="+base+", exp="+exp)
+            console.log("dt="+dt+", dz="+dz)
+            console.log("N="+N)
+            console.log("t0="+t0)
+            console.log("z0="+z0)
+            console.log("zmin/dz="+(zmin/dz))
+            console.log("N=Dt/dt="+(Dt/dt))
+            console.log("s*zmin%dt="+(s*zmin%dt))
+            console.log("i0="+i0)
+            console.log("jth="+jth)
+*/
          },
-         get zmax() { return this.zmin + this.dz; },
-         get tmax() { return this.tmin + this.dt; },
          itr: function() {
-            var self = this;
-            function tickItr(i) { 
-               var t = self.t0 + i*self.dtick;
-               return { t: self.t0 + i*self.dtick,
-                        z: Math.round(((self.i0 + i)*self.dtick/self.scl)*Math.pow(10,-self.exp))*Math.pow(10,self.exp),
-                        maj: (self.i0 + i)%self.jth === 0 };
-            }
-            tickItr.len = Math.floor((this.dt - this.t0)/this.dtick + 1);
-//console.log("n="+tickItr.len)
-            return tickItr;
+            var itr = (i) => {
+               return { t: this.t0 + i*this.dt,
+                        z: (this.z0 + i*this.dz).toFixed(-this.exp),
+                        maj: (this.j0 - this.i0 + i)%this.jth === 0 };
+            };
+            itr.len = this.N;
+            return itr;
          }
       }
    },
-   // static helpers ...
-   semiTransparentOf: function(hexstr) { 
-       var hex = parseInt(hexstr.substring(1),16); 
-       return "rgba("+((hex & 0xff0000) >> 16)+","+((hex & 0x00ff00) >> 8)+","+(hex & 0x0000ff)+",0.5)"; 
-   },
    // chart default properties
    style: { ls:"transparent",fs:"#efefef" },
+   color: false,
    title: {
       text: null,
       offset: 3,
@@ -319,10 +400,10 @@ g2.Chart = {
    func: {
       style: { lw:1, fs:"transparent" },
       // s. https://web.njit.edu/~kevin/rgb.txt.html
-      color: ["#426F42", /*medium seagreen*/
-              "#8B2500", /*orange red 4*/
-              "#23238E", /*navy*/
-              "#5D478B"  /*medium purple 4*/
+      colors: ["#426F42", /*medium seagreen*/
+               "#8B2500", /*orange red 4*/
+               "#23238E", /*navy*/
+               "#5D478B"  /*medium purple 4*/
              ]
    },
    xaxis: {
@@ -357,12 +438,63 @@ g2.Chart = {
          loc: "auto",    // "auto" | [2,4,6] | [{v:3.14,s:"pi"},{v:6.28,s:"2*pi"}]
          offset: 1,
          style: { foz:11 }
-/*
-         ticks: true,
-         offset: 7,
-         style: { ls:"#000", foc:"#000", foz:11, thal:"right", tval:"middle" },
-         loc:  "auto",   // "auto" | [2,4,6] | [{v:3.14,s:"pi"},{v:6.28,s:"2*pi"}]
-*/
+      }
+   },
+  /**
+   * Convert color from any format to object {r,g,b,a}.
+   * @private
+   */
+   Color: {
+      // convert to object {r,g,b,a}
+      rgba: function(color,alpha) {
+         var res;
+         alpha = alpha != undefined ? alpha : 1;
+         // color name ?
+         if (color === "transparent")
+            return {r:0,g:0,b:0,a:0};
+         if (color in g2.Chart.Color.names)
+            color = "#" + g2.Chart.Color.names[color];
+         // #rrggbb
+         if (res = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(color)) 
+            return {r:parseInt(res[1], 16), g:parseInt(res[2], 16), b:parseInt(res[3], 16), a:alpha};
+         // Look for #fff
+         if (res = /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(color)) 
+            return {r:parseInt(res[1] + res[1], 16), g:parseInt(res[2] + res[2], 16), b:parseInt(res[3] + res[3], 16), a:alpha};
+         // rgb(rrr,ggg,bbb)
+         if (res = /rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(color)) 
+            return {r:parseInt(res[1]), g:parseInt(res[2]), b:parseInt(res[3]), a:alpha};
+         // rgba(rrr,ggg,bbb,a)
+         if (res = /rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*\)/.exec(color)) 
+            return {r:parseInt(res[1]), g:parseInt(res[2]), b:parseInt(res[3]),a:(alpha!==undefined?alpha:parseFloat(res[4]))};
+         // rgb(rrr%,ggg%,bbb%)
+         if (res = /rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(color)) 
+            return {r:parseFloat(res[1]) * 2.55, g:parseFloat(res[2]) * 2.55, b:parseFloat(result[3]) * 2.55, a:alpha};
       },
+      rgbaStr: function(color,alpha) {
+         var c = g2.Chart.Color.rgba(color,alpha);
+         return "rgba("+c.r+","+c.g+","+c.b+","+c.a+")";
+      },
+      names: {
+         aliceblue: 'f0f8ff', antiquewhite: 'faebd7', aqua: '00ffff', aquamarine: '7fffd4', azure: 'f0ffff', beige: 'f5f5dc', bisque: 'ffe4c4', black: '000000',
+         blanchedalmond: 'ffebcd', blue: '0000ff', blueviolet: '8a2be2', brown: 'a52a2a', burlywood: 'deb887', cadetblue: '5f9ea0', chartreuse: '7fff00',
+         chocolate: 'd2691e', coral: 'ff7f50', cornflowerblue: '6495ed', cornsilk: 'fff8dc', crimson: 'dc143c', cyan: '00ffff', darkblue: '00008b', darkcyan: '008b8b',
+         darkgoldenrod: 'b8860b', darkgray: 'a9a9a9', darkgreen: '006400', darkkhaki: 'bdb76b', darkmagenta: '8b008b', darkolivegreen: '556b2f', darkorange: 'ff8c00',
+         darkorchid: '9932cc', darkred: '8b0000', darksalmon: 'e9967a', darkseagreen: '8fbc8f', darkslateblue: '483d8b', darkslategray: '2f4f4f', darkturquoise: '00ced1',
+         darkviolet: '9400d3', deeppink: 'ff1493', deepskyblue: '00bfff', dimgray: '696969', dodgerblue: '1e90ff', feldspar: 'd19275', firebrick: 'b22222',
+         floralwhite: 'fffaf0', forestgreen: '228b22', fuchsia: 'ff00ff', gainsboro: 'dcdcdc', ghostwhite: 'f8f8ff', gold: 'ffd700', goldenrod: 'daa520', gray: '808080',
+         green: '008000', greenyellow: 'adff2f', honeydew: 'f0fff0', hotpink: 'ff69b4', indianred : 'cd5c5c', indigo : '4b0082', ivory: 'fffff0', khaki: 'f0e68c', 
+         lavender: 'e6e6fa', lavenderblush: 'fff0f5', lawngreen: '7cfc00', lemonchiffon: 'fffacd', lightblue: 'add8e6', lightcoral: 'f08080', lightcyan: 'e0ffff',
+         lightgoldenrodyellow: 'fafad2', lightgrey: 'd3d3d3', lightgreen: '90ee90', lightpink: 'ffb6c1', lightsalmon: 'ffa07a', lightseagreen: '20b2aa', 
+         lightskyblue: '87cefa', lightslateblue: '8470ff', lightslategray: '778899', lightsteelblue: 'b0c4de', lightyellow: 'ffffe0', lime: '00ff00', limegreen: '32cd32',
+         linen: 'faf0e6', magenta: 'ff00ff', maroon: '800000', mediumaquamarine: '66cdaa', mediumblue: '0000cd', mediumorchid: 'ba55d3', mediumpurple: '9370d8',
+         mediumseagreen: '3cb371', mediumslateblue: '7b68ee', mediumspringgreen: '00fa9a', mediumturquoise: '48d1cc', mediumvioletred: 'c71585', midnightblue: '191970',     
+         mintcream: 'f5fffa', mistyrose: 'ffe4e1', moccasin: 'ffe4b5', navajowhite: 'ffdead', navy: '000080', oldlace: 'fdf5e6', olive: '808000', olivedrab: '6b8e23',
+         orange: 'ffa500', orangered: 'ff4500', orchid: 'da70d6', palegoldenrod: 'eee8aa', palegreen: '98fb98', paleturquoise: 'afeeee', palevioletred: 'd87093',
+         papayawhip: 'ffefd5', peachpuff: 'ffdab9', peru: 'cd853f', pink: 'ffc0cb', plum: 'dda0dd', powderblue: 'b0e0e6', purple: '800080', rebeccapurple:'663399',
+         red: 'ff0000', rosybrown: 'bc8f8f', royalblue: '4169e1', saddlebrown: '8b4513', salmon: 'fa8072', sandybrown: 'f4a460', seagreen: '2e8b57', seashell: 'fff5ee',
+         sienna: 'a0522d', silver: 'c0c0c0', skyblue: '87ceeb', slateblue: '6a5acd', slategray: '708090', snow: 'fffafa', springgreen: '00ff7f', steelblue: '4682b4',
+         tan: 'd2b48c', teal: '008080', thistle: 'd8bfd8', tomato: 'ff6347', turquoise: '40e0d0', violet: 'ee82ee', violetred: 'd02090', wheat: 'f5deb3', white: 'ffffff',
+         whitesmoke: 'f5f5f5', yellow: 'ffff00', yellowgreen: '9acd32'
+      }
    }
 };

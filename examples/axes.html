@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>chart axes test</title>
+</head>
+
+<body>
+    <h1>chart axes test</h1>
+    <canvas id="c" width=1200" height="200"></canvas>
+    <script src="../../g2/g2.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+        var pi = Math.PI;
+        g2().cartesian()
+            .chart({ x:100,y:100,b:180,h:100,
+                     xmin:0,xmax:1,
+                   })
+            .exe(document.getElementById("c").getContext("2d"));
+   </script>
+</body>
+</html>

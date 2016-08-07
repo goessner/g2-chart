@@ -1,7 +1,7 @@
 {
   "name": "g2d-chart",
-  "version": "0.2.0",
-  "description": "g2-chart - Chart addon for g2",
+  "version": "0.5.0",
+  "description": "g2-chart - Charts for g2",
   "keywords": [
     "chart",
     "line chart",
@@ -11,12 +11,15 @@
     "g2",
     "canvas",
     "svg",
-    "javascript"
+    "javascript",
+    "engineers",
+    "scientists",
+    "physics"
   ],
   "main": "g2.chart.js",
   "scripts": {
-    "build": "npm run minify && npm run cptest",
-    "minify": "uglifyjs ./g2.chart.js -o ./g2.chart.min.js --comments -m",
+    "build": "npm run minify && npm run jsdoc && npm run cptest",
+    "jsdoc": "jsdoc2md ./g2.chart.js > ./api.md",
     "cptest": "copyfiles -f ./test/*.* ../goessner.github.io/g2-chart/test"
   },
   "author": "Stefan Goessner <fang03@web.de>",

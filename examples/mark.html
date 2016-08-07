@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>g2 - markers on chart</title>
+    <style> canvas { border: 1px solid #000; } </style>
+</head>
+
+<body>
+    <h1>g2 - markers on chart</h1>
+    <canvas id="c" width="400" height="300"></canvas><br>
+    <script src="https://gitcdn.xyz/repo/goessner/g2/master/g2.min.js"></script>
+    <script src="../g2.chart.js"></script>
+    <script>
+      var ctx = document.getElementById("c").getContext("2d"),
+          ch = g2.Chart.create({ x:100,y:100,b:200,h:150,
+                                 xmin:-Math.PI/2,xmax:2*Math.PI,
+                                 funcs:[
+                                   {data:[-1,-2,3,2,6,0],fill:true},
+                                   {fn:Math.cos,dx:Math.PI/30,fill:true}
+                                 ],
+                                 title:{text:"funcs"},
+                                 yaxis:{title:"y",origin:true}
+                              }),
+          g = g2().clr().cartesian()
+                  .chart(ch);
+
+      g.cpy(ch.drawMarkersAt(g,4))
+      .exe(ctx);
+   </script>
+</body>
+</html>
