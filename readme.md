@@ -5,7 +5,7 @@
 # g2.chart
 
 `g2.chart` is an important brick for `g2.js` being an engineers and scientists graphics tool.
-`g2.chart` as a [`g2`](https://github.com/goessner/g2) addon generates x/y-line charts only, but it does it very well. 
+`g2.chart` as a [`g2`](https://github.com/goessner/g2) addon generates x/y-line charts only, but it does that very well. 
 
 ### Example: first chart
 ![g2 %amp; charts](./img/data.png)
@@ -129,7 +129,7 @@ Those markers can be set interactively then.
 ![dynamic charts](./img/interactive.gif)
 
 (animated gif)  
-see [example](https://goessner.github.io/g2/examples/interactive.html)
+see [example](https://goessner.github.io/g2-chart/examples/interactive.html)
 
 Markers can also get animated along simulation parameters.
 
@@ -137,7 +137,7 @@ Markers can also get animated along simulation parameters.
 ![dynamic charts](./img/dynamic.gif)
 
 (animated gif)  
-see [example](https://goessner.github.io/g2/examples/rotatingCrank.html)
+see [example](https://goessner.github.io/g2-chart/examples/rotatingCrank.html)
 
 
 ## Chart Properties
