@@ -1,6 +1,6 @@
 {
   "name": "g2d-chart",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "g2-chart - Charts for g2",
   "keywords": [
     "chart",
@@ -18,7 +18,7 @@
   ],
   "main": "g2.chart.js",
   "scripts": {
-    "build": "npm run minify && npm run jsdoc && npm run cptest",
+    "build": "npm run jsdoc && npm run cptest",
     "jsdoc": "jsdoc2md ./g2.chart.js > ./api.md",
     "cptest": "copyfiles -f ./test/*.* ../goessner.github.io/g2-chart/test"
   },
