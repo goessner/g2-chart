@@ -129,7 +129,7 @@ Those markers can be set interactively then.
 ![dynamic charts](./img/interactive.gif)
 
 (animated gif)  
-see [example](https://goessner.github.io/g2-chart/examples/interactive.html)
+see [example](https://goessner.github.io/g2-chart/examples/marks.html)
 
 Markers can also get animated along simulation parameters.
 
