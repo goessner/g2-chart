@@ -4,7 +4,7 @@
 
 # g2.chart
 
-`g2.chart` is an important brick for `g2.js` being an engineers and scientists graphics tool.
+`g2.chart` is an important brick for [`g2.js`](https://github.com/goessner/g2) being an engineers and scientists graphics tool.
 `g2.chart` as a [`g2`](https://github.com/goessner/g2) addon generates x/y-line charts only, but it does that very well. 
 
 ### Example: first chart
