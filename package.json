@@ -1,6 +1,6 @@
 {
   "name": "g2d-chart",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "g2-chart - Charts for g2",
   "keywords": [
     "chart",
@@ -18,9 +18,10 @@
   ],
   "main": "g2.chart.js",
   "scripts": {
-    "build": "npm run jsdoc && npm run cptest",
+    "build": "npm run jsdoc && npm run cptest && npm run cpsamp",
     "jsdoc": "jsdoc2md ./g2.chart.js > ./api.md",
-    "cptest": "copyfiles -f ./test/*.* ../goessner.github.io/g2-chart/test"
+    "cptest": "copyfiles -f ./test/*.* ../goessner.github.io/g2-chart/test",
+    "cpsamp": "copyfiles -f ./examples/*.html ../goessner.github.io/g2-chart/examples"
   },
   "author": "Stefan Goessner <fang03@web.de>",
   "repository": {

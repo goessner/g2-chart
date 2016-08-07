@@ -95,7 +95,7 @@ g2().cartesian()
 
 ## Chart API
 
-After a chart object is created, we might wan to interact with it then. So we would like to request 
+After a chart object is created, we might want to interact with it then. So we would like to request 
 canvas coordinates for certain chart area coordinates. There is a small API for supporting tasks like this.
 
 | Method | Arguments | Returns | Description |
@@ -106,7 +106,7 @@ canvas coordinates for certain chart area coordinates. There is a small API for 
 | `yOf(x)` | `x` chart x-value | `float` | y-value in chart coordinates. |
 | `drawMarkersAt(g,x)` | `g` `g2` instance `x` chart x-value | `object` | Draw marker points in canvas coordinates to `g2` instance `g` according to x-value for all functions in chart. |
 
-It is possible to place markers on the chart functions after it is gerenerated. For this we need to create a standalone chart instance via `g2.Chart.create` first.
+It is possible to place markers on chart functions after they are generated. For this we need to create a standalone chart instance via `g2.Chart.create` first.
 ### Example: chart marker
 ![chart marker](./img/marker.png)
 
@@ -123,15 +123,21 @@ var ctx = document.getElementById("c").getContext("2d"),
   .cpy(ch.drawMarkersAt(g,4))
   .exe(ctx);
 ```
-Those markers can be modified interactively
+Those markers can be set interactively then.
 
 ### Example: interactive chart
 ![dynamic charts](./img/interactive.gif)
 
-or animated with respect of simulation parameters.
+(animated gif)  
+see [example](https://goessner.github.io/g2/examples/interactive.html)
 
-### Example: first chart
+Markers can also get animated along simulation parameters.
+
+### Example: animated chart
 ![dynamic charts](./img/dynamic.gif)
+
+(animated gif)  
+see [example](https://goessner.github.io/g2/examples/rotatingCrank.html)
 
 
 ## Chart Properties

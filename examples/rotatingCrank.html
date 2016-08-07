@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Rotating Crank</title>
+</head>
+
+<body>
+    <h1>Rotating Crank</h1>
+    <canvas id="c" width="501" height="301"></canvas><br>
+    <span id="forward" style="cursor:pointer;">&#9654;</span>
+    <script src="https://gitcdn.xyz/repo/goessner/g2/master/g2.min.js"></script>
+    <script src="https://gitcdn.xyz/repo/goessner/g2-chart/master/g2.chart.min.js"></script>
+    <script src="https://gitcdn.xyz/repo/goessner/morphr/master/morphr.min.js"></script>
+    <script>
+// render to canvas via g2 ..
+function render() {
+   var rx = crank.r*Math.cos(crank.w), ry = crank.r*Math.sin(crank.w),
+       q = crank.w/2/Math.PI;
+   dynamics.del()
+           .lin(0,0,rx,ry)
+           .cir(rx,ry,5)
+           .cpy(posChart.drawMarkersAt(dynamics,q))
+           .cpy(velChart.drawMarkersAt(dynamics,q))
+           .cpy(accChart.drawMarkersAt(dynamics,q));
+   statics.exe(ctx);
+}
+var ctx = document.getElementById("c").getContext("2d"),
+    crank = {r:100,w:0},              // plain javascript crank object ...
+    posChart = g2.Chart.create({ x:200,y:-100,b:100,h:50,
+                                 xmin:0,xmax:1,
+                                 funcs:[{fn:Morphr.quadratic, dx:0.02, fill:true}],
+                                 yaxis:{title:"pos"}}),
+    velChart = g2.Chart.create({ x:200,y:-40,b:100,h:60,
+                                 xmin:0,xmax:1,
+                                 funcs:[{fn:(q) => { return q < 0.5 ? 4*q : 4 - 4*q }, dx:0.02, color:1, fill:true}],
+                                 xaxis:false,
+                                 yaxis:{title:"vel"}}),
+    accChart = g2.Chart.create({ x:200,y:30,b:100,h:70,
+                                 title:{text:"quadratic"},
+                                 xmin:0,xmax:1,
+                                 funcs:[{fn:(q) => { return q < 0.5 ? 4 : -4 }, dx:0.005, color:2, fill:true}],
+                                 xaxis:false,
+                                 yaxis:{title:"acc"}}),
+    dynamics = g2(),
+    statics = g2().clr().cartesian().pan(150,150)
+                  .style({fs:"papayawhip",ls:"darkslategray",lw:2})
+                  .chart(posChart)
+                  .chart(velChart)
+                  .chart(accChart)
+                  .use(dynamics)
+                  .cir(0,0,5),
+    morphr = Morphr.create(4,0,"quadratic")          // create and configure Morphr object ...
+                   .register((q) => { crank.w = q*2*Math.PI; })  // rotate by 360° in 4 s.
+                   .register(render);                // render to canvas
+
+document.getElementById("forward").addEventListener("click", (e) => {morphr.start()}, false);
+render();
+      // geometry
+    </script>
+</body>
+</html>
