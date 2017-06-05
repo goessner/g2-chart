@@ -380,7 +380,8 @@ g2.Chart = {
          itr: function() {
             var itr = (i) => {
                return { t: this.t0 + i*this.dt,
-                        z: (this.z0 + i*this.dz).toFixed(-this.exp),
+//                        z: (this.z0 + i*this.dz).toFixed(-this.exp),
+                        z: (this.z0 + i*this.dz).toFixed(Math.abs(this.exp)),
                         maj: (this.j0 - this.i0 + i)%this.jth === 0 };
             };
             itr.len = this.N;
@@ -457,7 +458,7 @@ g2.Chart = {
          // #rrggbb
          if (res = /#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(color)) 
             return {r:parseInt(res[1], 16), g:parseInt(res[2], 16), b:parseInt(res[3], 16), a:alpha};
-         // Look for #fff
+         // Look for #rgb
          if (res = /#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(color)) 
             return {r:parseInt(res[1] + res[1], 16), g:parseInt(res[2] + res[2], 16), b:parseInt(res[3] + res[3], 16), a:alpha};
          // rgb(rrr,ggg,bbb)
